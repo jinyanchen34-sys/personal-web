@@ -1,0 +1,1503 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>陈瑾嫣 - 个人主页</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        :root {
+            --color-primary: #FF2D92;
+            --color-secondary: #00F5D4;
+            --color-accent: #FFE66D;
+            --color-purple: #A855F7;
+            --color-cyan: #22D3EE;
+            --color-pink: #FB7185;
+            --color-yellow: #FBBF24;
+            --color-green: #34D399;
+            --color-bg: #0F0A1E;
+            --color-bg-light: #1A1030;
+            --color-text: #FFFFFF;
+            --color-text-muted: #A1A1AA;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--color-bg);
+            color: var(--color-text);
+            overflow-x: hidden;
+            cursor: none;
+        }
+        
+        /* 自定义光标 */
+        .custom-cursor {
+            position: fixed;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: rgba(255, 45, 146, 0.4);
+            mix-blend-mode: screen;
+            pointer-events: none;
+            z-index: 9999;
+            transition: transform 0.15s ease-out;
+            box-shadow: 0 0 10px var(--color-primary), 0 0 20px var(--color-primary);
+        }
+        
+        .custom-cursor.hovering {
+            transform: scale(2.5);
+            background: rgba(0, 245, 212, 0.6);
+            box-shadow: 0 0 15px var(--color-secondary), 0 0 30px var(--color-secondary);
+        }
+        
+        /* 噪点纹理 */
+        .noise {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.03;
+            pointer-events: none;
+            z-index: 100;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+        }
+        
+        /* 玻璃拟态效果 */
+        .glass {
+            background: rgba(26, 16, 48, 0.6);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .glass-pink {
+            background: rgba(255, 45, 146, 0.1);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 45, 146, 0.3);
+        }
+        
+        .glass-cyan {
+            background: rgba(0, 245, 212, 0.1);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(0, 245, 212, 0.3);
+        }
+        
+        .glass-purple {
+            background: rgba(168, 85, 247, 0.1);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(168, 85, 247, 0.3);
+        }
+        
+        /* 照片容器 */
+        .photo-container {
+            position: relative;
+            overflow: hidden;
+            border-radius: 20px;
+        }
+        
+        .photo-container::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(204, 255, 0, 0.1) 0%, transparent 50%);
+            z-index: 1;
+            pointer-events: none;
+        }
+        
+        /* 装饰性图案 */
+        .decorative-shape {
+            position: absolute;
+            opacity: 0.08;
+        }
+        
+        .shape-circle {
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--color-primary), var(--color-purple));
+        }
+        
+        .shape-diamond {
+            transform: rotate(45deg);
+            background: linear-gradient(135deg, var(--color-secondary), var(--color-cyan));
+        }
+        
+        .shape-star {
+            clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+            background: linear-gradient(135deg, var(--color-accent), var(--color-yellow));
+        }
+        
+        .shape-triangle {
+            clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+            background: linear-gradient(135deg, var(--color-pink), var(--color-primary));
+        }
+        
+        .shape-ring {
+            border: 2px solid var(--color-cyan);
+            border-radius: 50%;
+        }
+        
+        .shape-heart {
+            clip-path: path('M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z');
+            background: linear-gradient(135deg, var(--color-primary), var(--color-pink));
+        }
+        
+        /* 网格背景 */
+        .grid-bg {
+            background-image: 
+                linear-gradient(rgba(255, 45, 146, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 245, 212, 0.05) 1px, transparent 1px);
+            background-size: 50px 50px;
+        }
+        
+        /* 渐变文字 */
+        .gradient-text {
+            background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 25%, var(--color-accent) 50%, var(--color-purple) 75%, var(--color-primary) 100%);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: gradient-shift 3s ease infinite;
+        }
+        
+        @keyframes gradient-shift {
+            0% { background-position: 0% center; }
+            50% { background-position: 100% center; }
+            100% { background-position: 0% center; }
+        }
+        
+        /* 霓虹发光效果 */
+        .neon-glow {
+            box-shadow: 
+                0 0 5px var(--color-primary),
+                0 0 15px var(--color-primary),
+                0 0 30px rgba(255, 45, 146, 0.4),
+                inset 0 0 20px rgba(255, 45, 146, 0.1);
+        }
+        
+        .neon-glow-cyan {
+            box-shadow: 
+                0 0 5px var(--color-secondary),
+                0 0 15px var(--color-secondary),
+                0 0 30px rgba(0, 245, 212, 0.4);
+        }
+        
+        .neon-glow-purple {
+            box-shadow: 
+                0 0 5px var(--color-purple),
+                0 0 15px var(--color-purple),
+                0 0 30px rgba(168, 85, 247, 0.4);
+        }
+        
+        /* 卡片悬浮效果 */
+        .hover-lift {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .hover-lift:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+        
+        /* 跑马灯动画 */
+        @keyframes marquee {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+        
+        .marquee {
+            animation: marquee 20s linear infinite;
+        }
+        
+        /* 脉冲动画 */
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 20px rgba(204, 255, 0, 0.3); }
+            50% { box-shadow: 0 0 40px rgba(204, 255, 0, 0.6); }
+        }
+        
+        .pulse-glow {
+            animation: pulse-glow 2s ease-in-out infinite;
+        }
+        
+        /* 浮动动画 */
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(2deg); }
+        }
+        
+        .float {
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        /* 旋转动画 */
+        @keyframes rotate-slow {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        .rotate-slow {
+            animation: rotate-slow 30s linear infinite;
+        }
+        
+        /* 滚动条样式 */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #050505;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #CCFF00;
+            border-radius: 3px;
+        }
+        
+        /* 标签动画 */
+        .tag {
+            display: inline-block;
+            padding: 6px 14px;
+            background: rgba(255, 45, 146, 0.15);
+            border: 1px solid rgba(255, 45, 146, 0.4);
+            border-radius: 20px;
+            font-size: 12px;
+            color: var(--color-primary);
+            transition: all 0.3s ease;
+        }
+        
+        .tag:hover {
+            background: rgba(255, 45, 146, 0.3);
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 5px 20px rgba(255, 45, 146, 0.3);
+        }
+        
+        .tag-cyan {
+            background: rgba(0, 245, 212, 0.15);
+            border-color: rgba(0, 245, 212, 0.4);
+            color: var(--color-secondary);
+        }
+        
+        .tag-cyan:hover {
+            background: rgba(0, 245, 212, 0.3);
+            box-shadow: 0 5px 20px rgba(0, 245, 212, 0.3);
+        }
+        
+        .tag-purple {
+            background: rgba(168, 85, 247, 0.15);
+            border-color: rgba(168, 85, 247, 0.4);
+            color: var(--color-purple);
+        }
+        
+        .tag-purple:hover {
+            background: rgba(168, 85, 247, 0.3);
+            box-shadow: 0 5px 20px rgba(168, 85, 247, 0.3);
+        }
+        
+        .tag-yellow {
+            background: rgba(251, 191, 36, 0.15);
+            border-color: rgba(251, 191, 36, 0.4);
+            color: var(--color-yellow);
+        }
+        
+        .neon-tag {
+            position: relative;
+        }
+        
+        .neon-tag::before {
+            content: '';
+            position: absolute;
+            inset: -1px;
+            background: linear-gradient(45deg, var(--color-primary), var(--color-secondary), var(--color-purple), var(--color-primary));
+            background-size: 300% 300%;
+            border-radius: 20px;
+            z-index: -1;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            animation: shimmer 3s ease infinite;
+        }
+        
+        .neon-tag:hover::before {
+            opacity: 0.6;
+        }
+        
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+    </style>
+</head>
+<body>
+    <!-- 噪点纹理 -->
+    <div class="noise"></div>
+    
+    <!-- 自定义光标 -->
+    <div class="custom-cursor" id="cursor"></div>
+    
+    <div id="app">
+        <!-- Navigation -->
+        <nav ref="navbar" class="fixed top-0 left-0 right-0 z-50 px-6 py-4 transition-all duration-300">
+            <div class="max-w-6xl mx-auto flex items-center justify-between">
+                <a href="#hero" class="text-xl font-light tracking-wider hover:text-[#FF2D92] transition-colors">
+                    {{ profileData.name }}
+                </a>
+                <div class="hidden md:flex items-center gap-8">
+                    <a href="#about" class="text-gray-400 hover:text-white transition-colors">关于</a>
+                    <a href="#experience" class="text-gray-400 hover:text-white transition-colors">经历</a>
+                    <a href="#skills" class="text-gray-400 hover:text-white transition-colors">技能</a>
+                    <a href="#exchange" class="text-gray-400 hover:text-white transition-colors">海外交换</a>
+                    <a href="#writing" class="text-gray-400 hover:text-white transition-colors">写作</a>
+                    <a href="#career" class="text-gray-400 hover:text-white transition-colors">职业方向</a>
+                    <button @click="showWhyMe = true" 
+                            class="px-4 py-2 rounded-full glass-pink text-[#FF2D92] hover:bg-[#FF2D92] hover:text-white transition-all duration-300">
+                        Why Me
+                    </button>
+                </div>
+                <button @click="mobileMenuOpen = !mobileMenuOpen" class="md:hidden text-gray-400 hover:text-white">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path v-if="!mobileMenuOpen" d="M4 6h16M4 12h16M4 18h16"/>
+                        <path v-else d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+            <!-- Mobile Menu -->
+            <div v-if="mobileMenuOpen" class="md:hidden mt-4 glass rounded-xl p-4">
+                <a href="#about" @click="mobileMenuOpen = false" class="block py-2 text-gray-400 hover:text-white">关于</a>
+                <a href="#experience" @click="mobileMenuOpen = false" class="block py-2 text-gray-400 hover:text-white">经历</a>
+                <a href="#skills" @click="mobileMenuOpen = false" class="block py-2 text-gray-400 hover:text-white">技能</a>
+                <a href="#exchange" @click="mobileMenuOpen = false" class="block py-2 text-gray-400 hover:text-white">海外交换</a>
+                <a href="#writing" @click="mobileMenuOpen = false" class="block py-2 text-gray-400 hover:text-white">写作</a>
+                <a href="#career" @click="mobileMenuOpen = false" class="block py-2 text-gray-400 hover:text-white">职业方向</a>
+                <button @click="showWhyMe = true; mobileMenuOpen = false" 
+                        class="w-full mt-2 px-4 py-2 rounded-full glass-pink text-[#FF2D92]">
+                    Why Me
+                </button>
+            </div>
+        </nav>
+        
+        <!-- Hero Section -->
+        <section id="hero" class="min-h-screen flex items-center justify-center relative overflow-hidden grid-bg">
+            <!-- 背景装饰 -->
+            <div class="absolute inset-0 overflow-hidden">
+                <div class="absolute w-[600px] h-[600px] bg-[#FF2D92] rounded-full opacity-15 blur-[120px] -top-[200px] -left-[100px] animate-pulse"></div>
+                <div class="absolute w-[500px] h-[500px] bg-[#00F5D4] rounded-full opacity-10 blur-[100px] top-[50%] -right-[150px]"></div>
+                <div class="absolute w-[400px] h-[400px] bg-[#A855F7] rounded-full opacity-10 blur-[80px] bottom-[100px] left-[20%]"></div>
+                
+                <!-- 装饰性图案 -->
+                <div class="decorative-shape shape-circle w-[200px] h-[200px] top-[10%] right-[10%] rotate-slow"></div>
+                <div class="decorative-shape shape-diamond w-[100px] h-[100px] bottom-[20%] left-[5%] float"></div>
+                <div class="decorative-shape shape-star w-[80px] h-[80px] top-[60%] right-[30%] float" style="animation-delay: -2s;"></div>
+                <div class="decorative-shape shape-circle w-[150px] h-[150px] top-[80%] right-[5%] rotate-slow" style="animation-direction: reverse;"></div>
+                <div class="decorative-shape shape-triangle w-[60px] h-[60px] top-[30%] left-[15%] float" style="animation-delay: -1s;"></div>
+                <div class="decorative-shape shape-ring w-[120px] h-[120px] top-[45%] right-[5%] rotate-slow"></div>
+                <div class="decorative-shape shape-star w-[50px] h-[50px] bottom-[35%] right-[25%] float" style="animation-delay: -3s;"></div>
+                <div class="decorative-shape shape-heart w-[40px] h-[40px] top-[70%] left-[8%] float" style="animation-delay: -1.5s;"></div>
+                
+                <!-- MBTI主题装饰 -->
+                <div class="absolute top-[20%] left-[10%] text-[#FF2D92]/10 text-9xl font-light">ENFJ</div>
+                <div class="absolute bottom-[15%] right-[18%] text-[#00F5D4]/10 text-8xl font-light">🌟</div>
+            </div>
+            
+            <!-- 内容 -->
+            <div class="relative z-10 max-w-6xl mx-auto px-4 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                <!-- 照片 -->
+                <div ref="photoContainer" class="order-2 lg:order-1 flex justify-center opacity-0">
+                    <div class="relative">
+                        <!-- 外发光效果 -->
+                        <div class="absolute -inset-4 bg-gradient-to-br from-[#FF2D92]/30 via-[#A855F7]/20 to-[#00F5D4]/20 rounded-3xl blur-3xl"></div>
+                        <div class="photo-container w-64 h-80 md:w-80 md:h-96 pulse-glow neon-glow relative z-10">
+                            <img :src="profileData.photo" alt="陈瑾嫣" class="w-full h-full object-cover"/>
+                            <!-- 照片边框装饰 -->
+                            <div class="absolute inset-0 border border-[#FF2D92]/40 rounded-20 pointer-events-none"></div>
+                            <div class="absolute -bottom-2 -right-2 w-20 h-20 bg-gradient-to-br from-[#FF2D92]/20 to-[#00F5D4]/20 rounded-full blur-xl"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 文字内容 -->
+                <div ref="heroText" class="order-1 lg:order-2 text-center lg:text-left">
+                    <p ref="titlePrefix" class="text-[#FF2D92] text-sm tracking-[0.3em] uppercase mb-6 opacity-0">
+                        {{ profileData.titlePrefix }}
+                    </p>
+                    <h1 ref="heroName" class="text-6xl md:text-7xl lg:text-8xl font-light tracking-tight mb-4 opacity-0">
+                        <span class="gradient-text">{{ profileData.name }}</span>
+                    </h1>
+                    <h2 ref="heroTitle" class="text-xl md:text-2xl font-light text-gray-400 mb-6 opacity-0">
+                        {{ profileData.title }}
+                    </h2>
+                    
+                    <!-- MBTI和特点标签 -->
+                    <div ref="heroTags" class="flex flex-wrap gap-3 justify-center lg:justify-start mb-8 opacity-0">
+                        <span class="tag tag-cyan">MBTI: {{ profileData.mbti }}</span>
+                        <span class="tag tag-purple">九型人格: 7号</span>
+                        <span v-for="(trait, index) in profileData.traits" :key="trait" 
+                              :class="['tag', index === 0 ? 'tag' : index === 1 ? 'tag-cyan' : 'tag-purple']">
+                            {{ ['🌟', '💡', '🚀'][index] }} {{ trait }}
+                        </span>
+                    </div>
+                    
+                    <!-- 求职状态 -->
+                    <p ref="careerStatus" class="text-gray-300 text-base mb-8 opacity-0 leading-relaxed">
+                        <span class="text-[#FF2D92]">//</span> {{ profileData.careerStatus }}
+                    </p>
+                    
+                    <div ref="scrollIndicator" class="flex flex-col items-center lg:items-start opacity-0">
+                        <span class="text-xs text-gray-500 tracking-widest mb-4">向下滚动</span>
+                        <div class="w-px h-12 bg-gradient-to-b from-[#FF2D92] via-[#A855F7] to-[#00F5D4] animate-pulse"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- About Section -->
+        <section id="about" class="min-h-screen py-32 px-4 md:px-8 relative overflow-hidden">
+            <!-- 背景装饰 -->
+            <div class="absolute inset-0 grid-bg opacity-50"></div>
+            <div class="absolute w-[400px] h-[400px] bg-[#FF2D92] rounded-full opacity-10 blur-[120px] top-[10%] right-[5%]"></div>
+            <div class="absolute w-[300px] h-[300px] bg-[#00F5D4] rounded-full opacity-8 blur-[100px] bottom-[20%] left-[10%]"></div>
+            
+            <div class="relative z-10 max-w-6xl mx-auto">
+                <h2 ref="aboutTitle" class="text-3xl md:text-4xl font-light mb-16 text-center opacity-0">
+                    <span class="text-[#FF2D92]">01</span> / 关于我
+                </h2>
+                
+                <!-- Bento Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <!-- 简介 -->
+                    <div ref="aboutCard1" class="glass rounded-2xl p-8 col-span-1 md:col-span-2 lg:col-span-2 opacity-0 hover-lift">
+                        <div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-[#FF2D92]/10 to-transparent rounded-bl-full"></div>
+                        <h3 class="text-[#FF2D92] text-sm tracking-widest uppercase mb-4 relative z-10">简介</h3>
+                        <p class="text-gray-300 leading-relaxed relative z-10">
+                            {{ profileData.about.bio }}
+                        </p>
+                    </div>
+                    
+                    <!-- MBTI -->
+                    <div ref="aboutCard2" class="glass-pink rounded-2xl p-8 opacity-0 hover-lift group">
+                        <div class="absolute inset-0 bg-gradient-to-br from-[#FF2D92]/15 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                        <h3 class="text-[#FF2D92] text-sm tracking-widest uppercase mb-4 relative z-10">MBTI</h3>
+                        <div class="text-4xl md:text-5xl font-light text-white mb-2 relative z-10">
+                            <span class="gradient-text">{{ profileData.mbti }}</span>
+                        </div>
+                        <p class="text-gray-400 text-sm relative z-10">教育家型 · 热情洋溢</p>
+                    </div>
+                    
+                    <!-- 九型人格 -->
+                    <div ref="aboutCard3" class="glass-cyan rounded-2xl p-8 opacity-0 hover-lift group">
+                        <div class="absolute inset-0 bg-gradient-to-br from-[#00F5D4]/15 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                        <h3 class="text-[#00F5D4] text-sm tracking-widest uppercase mb-4 relative z-10">九型人格</h3>
+                        <div class="text-4xl md:text-5xl font-light text-white mb-2 relative z-10">
+                            <span class="gradient-text">7号</span>
+                        </div>
+                        <p class="text-gray-400 text-sm relative z-10">活跃型 · 乐观开朗</p>
+                    </div>
+                </div>
+                
+                <!-- 特点详情 -->
+                <div ref="traitsSection" class="mt-16 grid grid-cols-1 md:grid-cols-3 gap-6 opacity-0">
+                    <div v-for="(trait, index) in profileData.traits" :key="trait" 
+                         :class="['rounded-xl p-6 text-center hover-lift group relative overflow-hidden', index === 0 ? 'glass-pink' : index === 1 ? 'glass-cyan' : 'glass-purple']">
+                        <div :class="['absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300', 
+                                      index === 0 ? 'bg-gradient-to-br from-[#FF2D92]/20 to-transparent' : 
+                                      index === 1 ? 'bg-gradient-to-br from-[#00F5D4]/20 to-transparent' : 
+                                      'bg-gradient-to-br from-[#A855F7]/20 to-transparent']"></div>
+                        <div class="text-5xl mb-4 relative z-10 group-hover:scale-110 transition-transform duration-300">
+                            {{ ['🌟', '💡', '🚀'][index] }}
+                        </div>
+                        <h4 class="text-white font-medium relative z-10">{{ trait }}</h4>
+                        <p class="text-gray-400 text-xs mt-2 relative z-10">
+                            {{ ['保持好奇心', '创新思维活跃', '勇于迎接挑战'][index] }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Experience Section -->
+        <section id="experience" class="min-h-screen py-32 px-4 md:px-8 relative overflow-hidden">
+            <!-- 背景装饰 -->
+            <div class="absolute inset-0 grid-bg opacity-30"></div>
+            <div class="absolute w-[500px] h-[500px] bg-[#A855F7] rounded-full opacity-8 blur-[120px] top-[50%] left-[50%] transform -translate-x-1/2 -translate-y-1/2"></div>
+            
+            <div class="relative z-10 max-w-4xl mx-auto">
+                <h2 ref="experienceTitle" class="text-3xl md:text-4xl font-light mb-16 text-center opacity-0">
+                    <span class="text-[#A855F7]">02</span> / 经历
+                </h2>
+                
+                <!-- 时间轴 -->
+                <div class="relative">
+                    <!-- 时间轴线 -->
+                    <div class="absolute left-1/2 transform -translate-x-1/2 w-px h-full bg-gradient-to-b from-[#FF2D92] via-[#A855F7] to-transparent"></div>
+                    
+                    <!-- 经历卡片 -->
+                    <div v-for="(exp, index) in profileData.experience" :key="index" 
+                         :ref="el => { if (el) experienceRefs[index] = el }"
+                         class="relative mb-16 opacity-0 group"
+                         :class="index % 2 === 0 ? 'md:text-right' : 'md:text-left'">
+                        <div :class="index % 2 === 0 ? 'md:pr-1/2 md:pl-8' : 'md:pl-1/2 md:pr-8'">
+                            <div :class="['rounded-xl p-6 hover:bg-white/5 transition-all duration-300 cursor-pointer experience-card relative overflow-hidden', 
+                                          index % 2 === 0 ? 'glass-pink' : 'glass-cyan']">
+                                <div :class="['absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300', 
+                                              index % 2 === 0 ? 'bg-gradient-to-br from-[#FF2D92]/10 to-transparent' : 
+                                              'bg-gradient-to-br from-[#00F5D4]/10 to-transparent']"></div>
+                                <span :class="['text-xs tracking-widest uppercase relative z-10', 
+                                               index % 2 === 0 ? 'text-[#FF2D92]' : 'text-[#00F5D4]']">{{ exp.period }}</span>
+                                <h3 class="text-xl font-medium mt-2 mb-1 relative z-10">{{ exp.title }}</h3>
+                                <p class="text-gray-400 relative z-10">{{ exp.company }}</p>
+                                <p class="text-gray-400 text-sm mt-3 relative z-10">{{ exp.description }}</p>
+                            </div>
+                        </div>
+                        <!-- 时间轴点 -->
+                        <div class="absolute left-1/2 transform -translate-x-1/2 w-4 h-4 rounded-full mt-6 group-hover:scale-150 transition-transform duration-300"
+                             :class="index % 2 === 0 ? 'bg-[#FF2D92]' : 'bg-[#00F5D4]'"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Skills Section -->
+        <section id="skills" class="py-32 px-4 md:px-8 relative overflow-hidden">
+            <!-- 背景装饰 -->
+            <div class="absolute inset-0 grid-bg opacity-30"></div>
+            <div class="absolute w-[400px] h-[400px] bg-[#FF2D92] rounded-full opacity-8 blur-[100px] top-[10%] right-[10%]"></div>
+            <div class="absolute w-[300px] h-[300px] bg-[#00F5D4] rounded-full opacity-8 blur-[80px] bottom-[10%] left-[10%]"></div>
+            
+            <div class="relative z-10 max-w-6xl mx-auto">
+                <h2 ref="skillsTitle" class="text-3xl md:text-4xl font-light mb-16 text-center opacity-0">
+                    <span class="text-[#FF2D92]">03</span> / 技能栈
+                </h2>
+                
+                <!-- 跑马灯 -->
+                <div class="overflow-hidden py-8">
+                    <div class="marquee whitespace-nowrap">
+                        <span v-for="(skill, index) in [...profileData.skills, ...profileData.skills]" :key="index" 
+                              class="inline-block px-8 text-2xl md:text-3xl font-light text-gray-500 hover:text-[#FF2D92] transition-colors duration-300 cursor-default">
+                            {{ skill }}
+                        </span>
+                    </div>
+                </div>
+                
+                <!-- 技能详情 -->
+                <div ref="skillsGrid" class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-16 opacity-0">
+                    <div v-for="(skill, index) in profileData.skills" :key="index" 
+                         :class="['rounded-lg p-4 text-center hover-lift transition-all duration-300', 
+                                  index % 3 === 0 ? 'glass-pink hover:border-[#FF2D92]/50' : 
+                                  index % 3 === 1 ? 'glass-cyan hover:border-[#00F5D4]/50' : 
+                                  'glass-purple hover:border-[#A855F7]/50']">
+                        <span class="text-gray-300">{{ skill }}</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Overseas Exchange & Competition Section -->
+        <section id="exchange" class="min-h-screen py-32 px-4 md:px-8 relative overflow-hidden">
+            <!-- 背景装饰 -->
+            <div class="absolute inset-0 grid-bg opacity-30"></div>
+            <div class="absolute w-[600px] h-[600px] bg-[#A855F7] rounded-full opacity-10 blur-[150px] top-[20%] left-[10%]"></div>
+            <div class="absolute w-[500px] h-[500px] bg-[#FF2D92] rounded-full opacity-8 blur-[120px] bottom-[20%] right-[10%]"></div>
+            
+            <!-- 装饰性图案 -->
+            <div class="decorative-shape shape-circle w-[180px] h-[180px] top-[5%] right-[20%] rotate-slow"></div>
+            <div class="decorative-shape shape-star w-[70px] h-[70px] bottom-[30%] left-[15%] float"></div>
+            <div class="decorative-shape shape-heart w-[50px] h-[50px] top-[60%] right-[8%] float" style="animation-delay: -1s;"></div>
+            
+            <div class="relative z-10 max-w-6xl mx-auto">
+                <h2 ref="exchangeTitle" class="text-3xl md:text-4xl font-light mb-16 text-center opacity-0">
+                    <span class="text-[#A855F7]">04</span> / 海外交换与商赛
+                </h2>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <!-- 海外交换经历 -->
+                    <div ref="exchangeCard1" class="glass-purple rounded-2xl p-8 opacity-0 hover-lift relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#A855F7] to-[#FF2D92]"></div>
+                        <div class="absolute -top-10 -right-10 w-40 h-40 bg-[#A855F7]/10 rounded-full blur-2xl"></div>
+                        
+                        <div class="relative z-10">
+                            <div class="flex items-center gap-4 mb-6">
+                                <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#A855F7]/20 to-[#FF2D92]/20 flex items-center justify-center">
+                                    <span class="text-3xl">�🇰</span>
+                                </div>
+                                <div>
+                                    <h3 class="text-xl font-medium text-white">海外交换经历</h3>
+                                    <p class="text-gray-400 text-sm">丹麦 · 哥本哈根商学院</p>
+                                </div>
+                            </div>
+                            
+                            <p class="text-gray-300 leading-relaxed mb-6">
+                                在丹麦哥本哈根商学院交换期间，深入学习国际商务与跨文化管理课程，参与当地商业项目实践，与来自全球20+国家的同学组队完成案例分析。这段经历极大地拓宽了我的国际视野，提升了跨文化沟通能力和团队协作能力。
+                            </p>
+                            
+                            <div class="flex flex-wrap gap-2">
+                                <span class="tag tag-purple">国际视野</span>
+                                <span class="tag tag-cyan">跨文化沟通</span>
+                                <span class="tag">海外学习</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 商赛经历 -->
+                    <div ref="exchangeCard2" class="glass-pink rounded-2xl p-8 opacity-0 hover-lift relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#FF2D92] to-[#00F5D4]"></div>
+                        <div class="absolute -bottom-10 -left-10 w-40 h-40 bg-[#FF2D92]/10 rounded-full blur-2xl"></div>
+                        
+                        <div class="relative z-10">
+                            <div class="flex items-center gap-4 mb-6">
+                                <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#FF2D92]/20 to-[#00F5D4]/20 flex items-center justify-center">
+                                    <span class="text-3xl">🏆</span>
+                                </div>
+                                <div>
+                                    <h3 class="text-xl font-medium text-white">CBS全球案例大赛</h3>
+                                    <p class="text-gray-400 text-sm">2024.11 · 全球前十</p>
+                                </div>
+                            </div>
+                            
+                            <p class="text-gray-300 leading-relaxed mb-4">
+                                24小时为丹麦百年新闻媒体Berlingske设计用户增长策略，提取社媒评论关键词，结合竞品Guardian栏目分析，识别年轻用户"社群归属+观点碰撞"双需求。
+                            </p>
+                            
+                            <div class="space-y-3 mb-4">
+                                <div class="flex items-start gap-3">
+                                    <div class="w-2 h-2 rounded-full bg-[#FF2D92] mt-1.5 flex-shrink-0"></div>
+                                    <span class="text-gray-300 text-sm">创新设计"大咖观点PK"栏目模块，利用热点事件提升传统媒体吸睛度</span>
+                                </div>
+                                <div class="flex items-start gap-3">
+                                    <div class="w-2 h-2 rounded-full bg-[#00F5D4] mt-1.5 flex-shrink-0"></div>
+                                    <span class="text-gray-300 text-sm">运用Excel建模+Tableau可视化呈现用户互动数据和辩论板块效果</span>
+                                </div>
+                                <div class="flex items-start gap-3">
+                                    <div class="w-2 h-2 rounded-full bg-[#A855F7] mt-1.5 flex-shrink-0"></div>
+                                    <span class="text-gray-300 text-sm">方案创新性评分位列全球参赛队伍前10%</span>
+                                </div>
+                            </div>
+                            
+                            <div class="flex flex-wrap gap-2">
+                                <span class="tag tag-pink">用户增长</span>
+                                <span class="tag tag-cyan">数据分析</span>
+                                <span class="tag tag-purple">全球前十</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Writing Talent Section -->
+        <section id="writing" class="py-32 px-4 md:px-8 relative overflow-hidden">
+            <!-- 背景装饰 -->
+            <div class="absolute inset-0 grid-bg opacity-30"></div>
+            <div class="absolute w-[500px] h-[500px] bg-[#00F5D4] rounded-full opacity-8 blur-[120px] top-[30%] right-[5%]"></div>
+            
+            <div class="relative z-10 max-w-6xl mx-auto">
+                <h2 ref="writingTitle" class="text-3xl md:text-4xl font-light mb-16 text-center opacity-0">
+                    <span class="text-[#00F5D4]">05</span> / 写作特长
+                </h2>
+                
+                <div ref="writingCard" class="glass-cyan rounded-2xl p-8 md:p-12 opacity-0 hover-lift relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#00F5D4] via-[#A855F7] to-[#FF2D92]"></div>
+                    <div class="absolute top-20 right-10 w-64 h-64 bg-gradient-to-br from-[#00F5D4]/5 to-[#FF2D92]/5 rounded-full blur-3xl"></div>
+                    
+                    <div class="relative z-10">
+                        <div class="flex flex-col md:flex-row items-center gap-8">
+                            <div class="flex-shrink-0">
+                                <div class="w-24 h-24 rounded-2xl bg-gradient-to-br from-[#00F5D4]/20 to-[#FF2D92]/20 flex items-center justify-center">
+                                    <span class="text-5xl">✍️</span>
+                                </div>
+                            </div>
+                            
+                            <div class="flex-1 text-center md:text-left">
+                                <h3 class="text-2xl font-medium text-white mb-6">写作特长</h3>
+                                
+                                <div class="space-y-4">
+                                    <div class="flex items-center gap-4">
+                                        <div class="w-3 h-3 rounded-full bg-[#FF2D92]"></div>
+                                        <p class="text-gray-300">作文优秀</p>
+                                    </div>
+                                    <div class="flex items-center gap-4">
+                                        <div class="w-3 h-3 rounded-full bg-[#00F5D4]"></div>
+                                        <p class="text-gray-300">实习期间产出多篇深度报告</p>
+                                    </div>
+                                    <div class="flex items-center gap-4">
+                                        <div class="w-3 h-3 rounded-full bg-[#A855F7]"></div>
+                                        <p class="text-gray-300">有长期小说连载经历</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Career Section -->
+        <section id="career" class="min-h-screen py-32 px-4 md:px-8 relative overflow-hidden">
+            <!-- 背景效果 -->
+            <div class="absolute inset-0 grid-bg opacity-30"></div>
+            <div class="absolute w-[600px] h-[600px] bg-gradient-to-br from-[#FF2D92]/8 to-[#A855F7]/8 rounded-full blur-[150px] top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"></div>
+            
+            <!-- 装饰性图案 -->
+            <div class="decorative-shape shape-circle w-[150px] h-[150px] top-[10%] left-[5%] rotate-slow"></div>
+            <div class="decorative-shape shape-star w-[60px] h-[60px] top-[70%] right-[10%] float"></div>
+            <div class="decorative-shape shape-diamond w-[80px] h-[80px] bottom-[15%] left-[20%] float" style="animation-delay: -2s;"></div>
+            
+            <div class="relative z-10 max-w-4xl mx-auto">
+                <h2 ref="careerTitle" class="text-3xl md:text-4xl font-light mb-16 text-center opacity-0">
+                    <span class="text-[#FF2D92]">06</span> / 职业方向
+                </h2>
+                
+                <!-- 职业方向卡片 -->
+                <div ref="careerCards" class="grid grid-cols-1 md:grid-cols-3 gap-6 opacity-0">
+                    <div v-for="(direction, index) in profileData.careerDirections" :key="direction"
+                         :class="['rounded-2xl p-8 text-center group hover-lift relative overflow-hidden', 
+                                  index === 0 ? 'glass-pink' : index === 1 ? 'glass-cyan' : 'glass-purple']">
+                        <!-- 背景光晕 -->
+                        <div :class="['absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500',
+                                      index === 0 ? 'bg-gradient-to-br from-[#FF2D92]/15 to-transparent' :
+                                      index === 1 ? 'bg-gradient-to-br from-[#00F5D4]/15 to-transparent' :
+                                      'bg-gradient-to-br from-[#A855F7]/15 to-transparent']"></div>
+                        
+                        <!-- 图标 -->
+                        <div class="relative z-10">
+                            <div :class="['inline-flex items-center justify-center w-20 h-20 rounded-full mb-4 transition-all duration-300',
+                                          index === 0 ? 'bg-[#FF2D92]/15 group-hover:bg-[#FF2D92]/25' :
+                                          index === 1 ? 'bg-[#00F5D4]/15 group-hover:bg-[#00F5D4]/25' :
+                                          'bg-[#A855F7]/15 group-hover:bg-[#A855F7]/25']">
+                                <span class="text-5xl group-hover:scale-110 transition-transform duration-300">
+                                    {{ ['🌍', '🎯', '📊'][index] }}
+                                </span>
+                            </div>
+                            
+                            <h3 :class="['text-xl font-medium text-white mb-2 transition-colors duration-300',
+                                         index === 0 ? 'group-hover:text-[#FF2D92]' :
+                                         index === 1 ? 'group-hover:text-[#00F5D4]' :
+                                         'group-hover:text-[#A855F7]']">
+                                {{ direction }}
+                            </h3>
+                            
+                            <p class="text-gray-400 text-sm">正在努力学习中...</p>
+                            
+                            <!-- 进度条 -->
+                            <div class="mt-4 w-full h-1 bg-gray-700 rounded-full overflow-hidden">
+                                <div :class="['h-full rounded-full transition-all duration-1000 group-hover:w-full',
+                                              index === 0 ? 'bg-[#FF2D92]' :
+                                              index === 1 ? 'bg-[#00F5D4]' :
+                                              'bg-[#A855F7]']"
+                                     :style="{ width: ['60%', '45%', '55%'][index] }"></div>
+                            </div>
+                            <p class="text-gray-500 text-xs mt-2">{{ ['学习中', '探索中', '实践中'][index] }}</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 职业状态描述 -->
+                <div ref="careerDesc" class="mt-16 glass rounded-2xl p-8 opacity-0 relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#FF2D92] via-[#A855F7] to-[#00F5D4]"></div>
+                    <div class="flex items-start gap-4">
+                        <div class="text-3xl">🎯</div>
+                        <div>
+                            <h3 class="text-[#FF2D92] text-sm tracking-widest uppercase mb-2">职业目标</h3>
+                            <p class="text-gray-300 leading-relaxed">
+                                {{ profileData.careerStatus }}
+                            </p>
+                            <div class="mt-4 flex flex-wrap gap-2">
+                                <span class="tag tag-pink">跨行业转型</span>
+                                <span class="tag tag-cyan">持续学习</span>
+                                <span class="tag tag-purple">拥抱变化</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Why Me AI Matching Section -->
+        <section id="whyme" class="min-h-screen py-32 px-4 md:px-8 relative overflow-hidden">
+            <!-- 背景装饰 -->
+            <div class="absolute inset-0 grid-bg opacity-30"></div>
+            <div class="absolute w-[600px] h-[600px] bg-gradient-to-br from-[#FF2D92]/10 via-[#A855F7]/8 to-[#00F5D4]/8 rounded-full blur-[180px] top-[50%] left-[50%] transform -translate-x-1/2 -translate-y-1/2"></div>
+            
+            <!-- 装饰性图案 -->
+            <div class="decorative-shape shape-circle w-[200px] h-[200px] top-[10%] right-[15%] rotate-slow"></div>
+            <div class="decorative-shape shape-star w-[80px] h-[80px] bottom-[20%] left-[10%] float"></div>
+            <div class="decorative-shape shape-heart w-[60px] h-[60px] top-[70%] right-[8%] float" style="animation-delay: -2s;"></div>
+            
+            <div class="relative z-10 max-w-4xl mx-auto">
+                <h2 ref="whymeTitle" class="text-3xl md:text-4xl font-light mb-16 text-center opacity-0">
+                    <span class="text-[#FF2D92]">07</span> / Why Me
+                </h2>
+                
+                <div ref="whymeCard" class="glass rounded-2xl p-8 md:p-12 opacity-0">
+                    <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#FF2D92] via-[#A855F7] to-[#00F5D4]"></div>
+                    
+                    <div class="text-center mb-8">
+                        <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-[#FF2D92]/20 to-[#00F5D4]/20 mb-4">
+                            <span class="text-3xl">🤖</span>
+                        </div>
+                        <h3 class="text-xl font-medium text-white">AI岗位匹配分析</h3>
+                        <p class="text-gray-400 text-sm mt-2">输入职位描述，AI将为您分析匹配度</p>
+                    </div>
+                    
+                    <!-- JD输入 -->
+                    <div class="mb-6">
+                        <label class="block text-gray-400 text-sm mb-2">职位描述 (JD)</label>
+                        <textarea v-model="jdInput" 
+                                  class="w-full h-32 glass-purple rounded-xl p-4 text-gray-200 placeholder-gray-500 focus:outline-none focus:border-[#A855F7]/50 transition-all resize-none"
+                                  placeholder="请输入职位描述，例如：
+海外营销岗位，负责社交媒体运营、内容创作，需要良好的英语能力和跨文化沟通能力..."></textarea>
+                    </div>
+                    
+                    <!-- 匹配按钮 -->
+                    <button @click="generateMatch" 
+                            :disabled="isGenerating || !jdInput.trim()"
+                            class="w-full py-3 rounded-xl bg-gradient-to-r from-[#FF2D92] to-[#A855F7] text-white font-medium hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+                        <span v-if="isGenerating" class="animate-spin">⚡</span>
+                        <span>{{ isGenerating ? '分析中...' : '开始匹配分析' }}</span>
+                    </button>
+                    
+                    <!-- 匹配结果 -->
+                    <div v-if="matchResult" class="mt-8 space-y-6">
+                        <!-- 匹配度评分 -->
+                        <div class="text-center">
+                            <div class="inline-flex items-center justify-center w-24 h-24 rounded-full bg-gradient-to-br from-[#FF2D92]/20 to-[#00F5D4]/20 mb-4">
+                                <span class="text-4xl font-bold gradient-text">{{ matchResult.matchPercentage }}%</span>
+                            </div>
+                            <p class="text-gray-400">综合匹配度</p>
+                        </div>
+                        
+                        <!-- 匹配点 -->
+                        <div class="glass-pink rounded-xl p-6">
+                            <h4 class="text-[#FF2D92] font-medium mb-4 flex items-center gap-2">
+                                <span>✅</span> 匹配点
+                            </h4>
+                            <ul class="space-y-3">
+                                <li v-for="(point, index) in matchResult.matches" :key="index" 
+                                    class="flex items-start gap-3">
+                                    <span class="text-[#FF2D92] mt-1">{{ ['🎯', '🌟', '💡', '🚀', '💪'][index] }}</span>
+                                    <div>
+                                        <p class="text-white">{{ point.title }}</p>
+                                        <p class="text-gray-400 text-sm mt-1">{{ point.description }}</p>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                        
+                        <!-- 待提升点 -->
+                        <div class="glass-cyan rounded-xl p-6">
+                            <h4 class="text-[#00F5D4] font-medium mb-4 flex items-center gap-2">
+                                <span>📈</span> 待提升点
+                            </h4>
+                            <ul class="space-y-3">
+                                <li v-for="(point, index) in matchResult.improvements" :key="index" 
+                                    class="flex items-start gap-3">
+                                    <span class="text-[#00F5D4] mt-1">{{ ['🔍', '📚', '🎯', '💬'][index] }}</span>
+                                    <div>
+                                        <p class="text-white">{{ point.title }}</p>
+                                        <p class="text-gray-400 text-sm mt-1">{{ point.description }}</p>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                        
+                        <!-- 总结建议 -->
+                        <div class="glass rounded-xl p-6">
+                            <h4 class="text-[#A855F7] font-medium mb-4 flex items-center gap-2">
+                                <span>💡</span> 综合建议
+                            </h4>
+                            <p class="text-gray-300 leading-relaxed">{{ matchResult.summary }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Footer Section -->
+        <footer id="footer" class="min-h-screen flex items-center justify-center px-4 md:px-8 relative overflow-hidden">
+            <!-- 背景效果 -->
+            <div class="absolute inset-0">
+                <div class="absolute w-[800px] h-[800px] bg-gradient-to-br from-[#FF2D92]/8 via-[#A855F7]/8 to-[#00F5D4]/8 rounded-full blur-[180px] bottom-0 left-1/2 transform -translate-x-1/2"></div>
+                <!-- 装饰图案 -->
+                <div class="decorative-shape shape-circle w-[300px] h-[300px] top-[20%] left-[10%] rotate-slow"></div>
+                <div class="decorative-shape shape-star w-[100px] h-[100px] top-[40%] right-[15%] float"></div>
+                <div class="decorative-shape shape-heart w-[80px] h-[80px] bottom-[30%] left-[5%] float" style="animation-delay: -1.5s;"></div>
+            </div>
+            
+            <div class="relative z-10 text-center max-w-4xl mx-auto">
+                <h2 ref="footerTitle" class="text-5xl md:text-7xl lg:text-8xl font-light mb-8 opacity-0">
+                    <span class="gradient-text">联系</span>我
+                </h2>
+                <p ref="footerDesc" class="text-gray-400 text-lg mb-12 opacity-0">
+                    {{ profileData.footer.description }}
+                </p>
+                
+                <!-- 联系方式 -->
+                <div ref="contactLinks" class="flex flex-col md:flex-row items-center justify-center gap-6 opacity-0">
+                    <a :href="'mailto:' + profileData.footer.email" 
+                       class="contact-link glass-pink rounded-full px-8 py-3 text-[#FF2D92] hover:bg-[#FF2D92] hover:text-white transition-all duration-300">
+                        {{ profileData.footer.email }}
+                    </a>
+                    <a :href="'tel:' + profileData.footer.phone" 
+                       class="contact-link glass-cyan rounded-full px-8 py-3 text-[#00F5D4] hover:bg-[#00F5D4] hover:text-black transition-all duration-300">
+                        {{ profileData.footer.phone }}
+                    </a>
+                    <a v-for="social in profileData.footer.social" :key="social.name"
+                       :href="social.url" 
+                       class="contact-link glass-purple rounded-full px-6 py-3 text-[#A855F7] hover:bg-[#A855F7] hover:text-white transition-all duration-300">
+                        {{ social.name }}
+                    </a>
+                </div>
+                
+                <p ref="footerCopyright" class="text-gray-500 text-sm mt-16 opacity-0">
+                    © {{ new Date().getFullYear() }} {{ profileData.name }}. All rights reserved.
+                </p>
+            </div>
+        </footer>
+    </div>
+    
+    <script>
+        // 配置数据 - 请根据实际情况修改
+        const profileData = {
+            name: '陈瑾嫣',
+            title: '金融科技学生',
+            titlePrefix: 'FinTech Student',
+            photo: '../实习/微信图片_20260407143321_7_85.jpg',
+            mbti: 'ENFJ',
+            traits: ['喜好新鲜事物', '鬼点子大王', '热爱挑战'],
+            careerStatus: '正在尝试从金融转向感兴趣的海外营销、产品、海外运营，努力ing！',
+            careerDirections: ['海外营销', '产品经理', '海外运营'],
+            about: {
+                bio: '中山大学岭南学院金融专业本科在读，上海交通大学安泰经济与管理学院科创金融硕士预录取。热爱金融科技领域，具备扎实的金融知识与数据分析能力，曾参与多项科研项目与商业竞赛，具有跨境电商创业经验。喜欢探索新事物，善于提出创新想法。',
+                experience: '2+',
+                location: '广州'
+            },
+            experience: [
+                {
+                    period: '2025.01 - 2025.02',
+                    title: '传媒行业研究实习生',
+                    company: '西南证券',
+                    description: '围绕娱乐传媒板块热点赛道，聚焦IP文创与AI玩具细分领域，完成奥飞娱乐、实丰文化的商业模式拆解。'
+                },
+                {
+                    period: '2023.08 - 2023.09',
+                    title: '市场与融资支持实习',
+                    company: '湖南欣欣向荣智能科技有限公司',
+                    description: '聚焦AGV行业，调研国内外智能搬运机器人头部企业，输出完整竞品分析报告，参与创业路演材料准备。'
+                },
+                {
+                    period: '2023.01 - 2023.02',
+                    title: '营业网点实习生',
+                    company: '中国农业银行湖南省分行雨花区支行',
+                    description: '营销"乐分易"等信贷产品，累计触达客户超200人次，成功促成信贷业务签约15单、养老金账户开通32户。'
+                },
+                {
+                    period: '2025.02 - 2025.04',
+                    title: 'CMK高校菁英计划成员',
+                    company: '宝洁',
+                    description: '针对"Olay小白瓶"开展用户内容分析，运用Python的Bert模型进行情感分析，设计创新故事线获产品组内冠军。'
+                },
+                {
+                    period: '2025.02 - 2026.01',
+                    title: '跨境电商创业负责人',
+                    company: '自主创业',
+                    description: '创建运营两个跨境电商店铺，分析TikTok、Instagram平台数据，实现数字化选品并成功盈利。'
+                }
+            ],
+            skills: ['Office', 'SQL', 'Stata', 'Python', 'Tableau', 'Excel', 'Bert', '情感分析', '竞品分析', '市场研究', '数据分析', '报告撰写'],
+            footer: {
+                description: '期待与您交流金融科技、海外营销领域的见解与机会',
+                email: '2293933001@qq.com',
+                phone: '+86 147-8970-9709',
+                social: [
+                    { name: '微信', url: '#' },
+                    { name: '领英', url: '#' },
+                    { name: '微博', url: '#' }
+                ]
+            }
+        };
+        
+        const { createApp, ref, onMounted } = Vue;
+        
+        createApp({
+            setup() {
+                const titlePrefix = ref(null);
+                const heroName = ref(null);
+                const heroTitle = ref(null);
+                const heroTags = ref(null);
+                const careerStatus = ref(null);
+                const scrollIndicator = ref(null);
+                const photoContainer = ref(null);
+                const aboutTitle = ref(null);
+                const aboutCard1 = ref(null);
+                const aboutCard2 = ref(null);
+                const aboutCard3 = ref(null);
+                const traitsSection = ref(null);
+                const experienceTitle = ref(null);
+                const experienceRefs = ref([]);
+                const skillsTitle = ref(null);
+                const skillsGrid = ref(null);
+                const exchangeTitle = ref(null);
+                const exchangeCard1 = ref(null);
+                const exchangeCard2 = ref(null);
+                const writingTitle = ref(null);
+                const writingCard = ref(null);
+                const careerTitle = ref(null);
+                const careerCards = ref(null);
+                const careerDesc = ref(null);
+                const footerTitle = ref(null);
+                const footerDesc = ref(null);
+                const contactLinks = ref(null);
+                const footerCopyright = ref(null);
+                const whymeTitle = ref(null);
+                const whymeCard = ref(null);
+                
+                // Why Me AI匹配功能
+                const jdInput = ref('');
+                const isGenerating = ref(false);
+                const matchResult = ref(null);
+                const showWhyMe = ref(false);
+                const mobileMenuOpen = ref(false);
+                
+                // 个人资料用于AI匹配分析
+                const personalProfile = {
+                    education: '中山大学岭南学院金融专业本科在读，上海交通大学安泰经济与管理学院科创金融硕士预录取',
+                    learningAbility: '具备快速学习能力，曾完成多项跨领域研究项目，包括传媒行业研究、跨境电商创业等',
+                    experience: '拥有证券研究、市场分析、跨境电商创业等多领域实习和创业经历，参与欧莱雅商赛获中国区Top 10',
+                    personality: {
+                        mbti: 'ENFJ',
+                        enneagram: '7号',
+                        traits: ['善于人际交往', '与人沟通能力强', '具有创造力', '想象力丰富', '超强执行力']
+                    },
+                    interests: ['海外营销', '产品经理', '海外运营', '金融科技', '内容创作']
+                };
+                
+                const generateMatch = () => {
+                    isGenerating.value = true;
+                    matchResult.value = null;
+                    
+                    // 模拟AI分析延迟
+                    setTimeout(() => {
+                        const jd = jdInput.value.toLowerCase();
+                        
+                        // 根据JD内容分析匹配度
+                        let matchPercentage = 65;
+                        const matches = [];
+                        const improvements = [];
+                        
+                        // 匹配度分析
+                        if (jd.includes('营销') || jd.includes('marketing')) {
+                            matchPercentage += 10;
+                            matches.push({
+                                title: '营销相关经验匹配',
+                                description: '跨境电商创业经历，负责店铺运营和营销策略制定，具备实际营销实战经验。欧莱雅商赛经历展示了营销策划能力。'
+                            });
+                        }
+                        
+                        if (jd.includes('海外') || jd.includes('international') || jd.includes('global')) {
+                            matchPercentage += 8;
+                            matches.push({
+                                title: '国际化视野匹配',
+                                description: '意大利博洛尼亚大学交换经历，具备跨文化沟通能力和国际视野，能够适应海外工作环境。'
+                            });
+                        }
+                        
+                        if (jd.includes('产品') || jd.includes('product')) {
+                            matchPercentage += 5;
+                            matches.push({
+                                title: '产品思维匹配',
+                                description: '参与宝洁CMK菁英计划，运用数据分析进行用户洞察和产品优化，具备产品思维。'
+                            });
+                        }
+                        
+                        if (jd.includes('沟通') || jd.includes('communication')) {
+                            matchPercentage += 5;
+                            matches.push({
+                                title: '沟通能力匹配',
+                                description: 'ENFJ性格特质，善于与人交往和团队协作，具备优秀的沟通能力和同理心。'
+                            });
+                        }
+                        
+                        if (jd.includes('创作') || jd.includes('content') || jd.includes('writing')) {
+                            matchPercentage += 5;
+                            matches.push({
+                                title: '内容创作能力',
+                                description: '拥有50万字+小说连载经验，擅长文字表达和内容创作，可应用于内容营销领域。'
+                            });
+                        }
+                        
+                        if (jd.includes('数据') || jd.includes('analysis')) {
+                            matchPercentage += 5;
+                            matches.push({
+                                title: '数据分析能力',
+                                description: '掌握Python、SQL、Tableau等数据分析工具，曾运用Bert模型进行情感分析项目。'
+                            });
+                        }
+                        
+                        // 待提升点分析
+                        if (!jd.includes('技术') && !jd.includes('tech')) {
+                            improvements.push({
+                                title: '技术技能补充',
+                                description: '当前技术背景以金融和数据分析为主，若岗位涉及更多技术开发，建议补充相关技能学习。'
+                            });
+                        }
+                        
+                        if (!jd.includes('设计') && !jd.includes('design')) {
+                            improvements.push({
+                                title: '设计能力提升',
+                                description: '可考虑学习基础设计工具（如Figma），提升视觉表达能力，增强营销物料制作能力。'
+                            });
+                        }
+                        
+                        improvements.push({
+                            title: '行业深耕',
+                            description: '建议聚焦目标行业深入学习，通过实习或项目积累更多相关领域经验。'
+                        });
+                        
+                        // 确保匹配度在合理范围
+                        matchPercentage = Math.min(95, Math.max(45, matchPercentage));
+                        
+                        const summary = `综合来看，您与该岗位的匹配度为${matchPercentage}%。您的ENFJ性格特质、海外交换经历和创业经验是重要优势。建议针对待提升点进行系统学习，可以从${improvements[0]?.title?.replace('提升', '') || '相关技能'}入手，进一步增强竞争力。保持您的创造力和执行力，相信您能够在目标岗位上取得出色表现！`;
+                        
+                        matchResult.value = {
+                            matchPercentage,
+                            matches: matches.slice(0, 5),
+                            improvements: improvements.slice(0, 3),
+                            summary
+                        };
+                        
+                        isGenerating.value = false;
+                    }, 1500);
+                };
+                
+                onMounted(() => {
+                    // 注册ScrollTrigger
+                    gsap.registerPlugin(ScrollTrigger);
+                    
+                    // Hero动画
+                    gsap.timeline()
+                        .to(photoContainer.value, { opacity: 1, scale: 0.95, duration: 1.2, delay: 0.3 })
+                        .to(titlePrefix.value, { opacity: 1, y: 20, duration: 1 }, '-=1')
+                        .to(heroName.value, { opacity: 1, y: 30, duration: 1.2 }, '-=0.5')
+                        .to(heroTitle.value, { opacity: 1, y: 20, duration: 1 }, '-=0.8')
+                        .to(heroTags.value, { opacity: 1, y: 20, duration: 0.8 }, '-=0.5')
+                        .to(careerStatus.value, { opacity: 1, y: 10, duration: 0.8 }, '-=0.3')
+                        .to(scrollIndicator.value, { opacity: 1, y: 20, duration: 1 }, '-=0.5');
+                    
+                    // About动画
+                    gsap.to(aboutTitle.value, {
+                        scrollTrigger: {
+                            trigger: aboutTitle.value,
+                            start: 'top 80%'
+                        },
+                        opacity: 1,
+                        y: 30,
+                        duration: 0.8
+                    });
+                    
+                    gsap.to([aboutCard1.value, aboutCard2.value, aboutCard3.value], {
+                        scrollTrigger: {
+                            trigger: aboutCard1.value,
+                            start: 'top 80%'
+                        },
+                        opacity: 1,
+                        y: 30,
+                        duration: 0.8,
+                        stagger: 0.2
+                    });
+                    
+                    gsap.to(traitsSection.value, {
+                        scrollTrigger: {
+                            trigger: traitsSection.value,
+                            start: 'top 80%'
+                        },
+                        opacity: 1,
+                        y: 30,
+                        duration: 0.8
+                    });
+                    
+                    // Experience动画
+                    gsap.to(experienceTitle.value, {
+                        scrollTrigger: {
+                            trigger: experienceTitle.value,
+                            start: 'top 80%'
+                        },
+                        opacity: 1,
+                        y: 30,
+                        duration: 0.8
+                    });
+                    
+                    experienceRefs.value.forEach((el, index) => {
+                        if (el) {
+                            gsap.to(el, {
+                                scrollTrigger: {
+                                    trigger: el,
+                                    start: 'top 85%'
+                                },
+                                opacity: 1,
+                                x: index % 2 === 0 ? -50 : 50,
+                                duration: 0.8
+                            });
+                        }
+                    });
+                    
+                    // Skills动画
+                    gsap.to(skillsTitle.value, {
+                        scrollTrigger: {
+                            trigger: skillsTitle.value,
+                            start: 'top 80%'
+                        },
+                        opacity: 1,
+                        y: 30,
+                        duration: 0.8
+                    });
+                    
+                    gsap.to(skillsGrid.value, {
+                        scrollTrigger: {
+                            trigger: skillsGrid.value,
+                            start: 'top 80%'
+                        },
+                        opacity: 1,
+                        y: 30,
+                        duration: 0.8
+                    });
+                    
+                    // Exchange动画
+                    gsap.to(exchangeTitle.value, {
+                        scrollTrigger: {
+                            trigger: exchangeTitle.value,
+                            start: 'top 80%'
+                        },
+                        opacity: 1,
+                        y: 30,
+                        duration: 0.8
+                    });
+                    
+                    gsap.to([exchangeCard1.value, exchangeCard2.value], {
+                        scrollTrigger: {
+                            trigger: exchangeCard1.value,
+                            start: 'top 80%'
+                        },
+                        opacity: 1,
+                        y: 30,
+                        duration: 0.8,
+                        stagger: 0.2
+                    });
+                    
+                    // Writing动画
+                    gsap.to(writingTitle.value, {
+                        scrollTrigger: {
+                            trigger: writingTitle.value,
+                            start: 'top 80%'
+                        },
+                        opacity: 1,
+                        y: 30,
+                        duration: 0.8
+                    });
+                    
+                    gsap.to(writingCard.value, {
+                        scrollTrigger: {
+                            trigger: writingCard.value,
+                            start: 'top 80%'
+                        },
+                        opacity: 1,
+                        y: 30,
+                        duration: 0.8
+                    });
+                    
+                    // Career动画
+                    gsap.to(careerTitle.value, {
+                        scrollTrigger: {
+                            trigger: careerTitle.value,
+                            start: 'top 80%'
+                        },
+                        opacity: 1,
+                        y: 30,
+                        duration: 0.8
+                    });
+                    
+                    gsap.to(careerCards.value, {
+                        scrollTrigger: {
+                            trigger: careerCards.value,
+                            start: 'top 80%'
+                        },
+                        opacity: 1,
+                        y: 30,
+                        duration: 0.8,
+                        stagger: 0.2
+                    });
+                    
+                    gsap.to(careerDesc.value, {
+                        scrollTrigger: {
+                            trigger: careerDesc.value,
+                            start: 'top 85%'
+                        },
+                        opacity: 1,
+                        y: 20,
+                        duration: 0.8
+                    });
+                    
+                    // Footer动画
+                    gsap.to(footerTitle.value, {
+                        scrollTrigger: {
+                            trigger: footerTitle.value,
+                            start: 'top 80%'
+                        },
+                        opacity: 1,
+                        y: 50,
+                        duration: 1
+                    });
+                    
+                    gsap.to(footerDesc.value, {
+                        scrollTrigger: {
+                            trigger: footerDesc.value,
+                            start: 'top 85%'
+                        },
+                        opacity: 1,
+                        y: 20,
+                        duration: 0.8
+                    });
+                    
+                    gsap.to(contactLinks.value, {
+                        scrollTrigger: {
+                            trigger: contactLinks.value,
+                            start: 'top 85%'
+                        },
+                        opacity: 1,
+                        y: 20,
+                        duration: 0.8,
+                        stagger: 0.1
+                    });
+                    
+                    gsap.to(footerCopyright.value, {
+                        scrollTrigger: {
+                            trigger: footerCopyright.value,
+                            start: 'top 90%'
+                        },
+                        opacity: 1,
+                        duration: 0.8
+                    });
+                    
+                    // Why Me动画
+                    gsap.to(whymeTitle.value, {
+                        scrollTrigger: {
+                            trigger: whymeTitle.value,
+                            start: 'top 80%'
+                        },
+                        opacity: 1,
+                        y: 30,
+                        duration: 0.8
+                    });
+                    
+                    gsap.to(whymeCard.value, {
+                        scrollTrigger: {
+                            trigger: whymeCard.value,
+                            start: 'top 80%'
+                        },
+                        opacity: 1,
+                        y: 30,
+                        duration: 0.8
+                    });
+                    
+                    // 自定义光标
+                    const cursor = document.getElementById('cursor');
+                    let cursorX = 0, cursorY = 0;
+                    let targetX = 0, targetY = 0;
+                    
+                    document.addEventListener('mousemove', (e) => {
+                        targetX = e.clientX;
+                        targetY = e.clientY;
+                    });
+                    
+                    function animateCursor() {
+                        cursorX += (targetX - cursorX) * 0.15;
+                        cursorY += (targetY - cursorY) * 0.15;
+                        cursor.style.left = cursorX + 'px';
+                        cursor.style.top = cursorY + 'px';
+                        requestAnimationFrame(animateCursor);
+                    }
+                    animateCursor();
+                    
+                    // 链接磁吸效果
+                    const links = document.querySelectorAll('a, .experience-card');
+                    links.forEach(link => {
+                        link.addEventListener('mouseenter', () => {
+                            cursor.classList.add('hovering');
+                        });
+                        link.addEventListener('mouseleave', () => {
+                            cursor.classList.remove('hovering');
+                        });
+                    });
+                    
+                    // 时间轴悬停效果
+                    const experienceCards = document.querySelectorAll('.experience-card');
+                    experienceCards.forEach((card, index) => {
+                        card.addEventListener('mouseenter', () => {
+                            experienceCards.forEach((c, i) => {
+                                if (i !== index) {
+                                    gsap.to(c, { opacity: 0.3, duration: 0.3 });
+                                }
+                            });
+                            gsap.to(card, { scale: 1.02, duration: 0.3 });
+                        });
+                        card.addEventListener('mouseleave', () => {
+                            experienceCards.forEach(c => {
+                                gsap.to(c, { opacity: 1, duration: 0.3 });
+                            });
+                            gsap.to(card, { scale: 1, duration: 0.3 });
+                        });
+                    });
+                });
+                
+                return {
+                    profileData,
+                    titlePrefix,
+                    heroName,
+                    heroTitle,
+                    heroTags,
+                    careerStatus,
+                    scrollIndicator,
+                    photoContainer,
+                    aboutTitle,
+                    aboutCard1,
+                    aboutCard2,
+                    aboutCard3,
+                    traitsSection,
+                    experienceTitle,
+                    experienceRefs,
+                    skillsTitle,
+                    skillsGrid,
+                    exchangeTitle,
+                    exchangeCard1,
+                    exchangeCard2,
+                    writingTitle,
+                    writingCard,
+                    careerTitle,
+                    careerCards,
+                    careerDesc,
+                    footerTitle,
+                    footerDesc,
+                    contactLinks,
+                    footerCopyright,
+                    whymeTitle,
+                    whymeCard,
+                    jdInput,
+                    isGenerating,
+                    matchResult,
+                    showWhyMe,
+                    mobileMenuOpen,
+                    generateMatch
+                };
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>
