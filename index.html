@@ -359,10 +359,10 @@
                     <a href="#exchange" class="text-gray-400 hover:text-white transition-colors">海外交换</a>
                     <a href="#writing" class="text-gray-400 hover:text-white transition-colors">写作</a>
                     <a href="#career" class="text-gray-400 hover:text-white transition-colors">职业方向</a>
-                    <button @click="showWhyMe = true" 
-                            class="px-4 py-2 rounded-full glass-pink text-[#FF2D92] hover:bg-[#FF2D92] hover:text-white transition-all duration-300">
+                    <a href="#whyme" 
+                       class="px-4 py-2 rounded-full glass-pink text-[#FF2D92] hover:bg-[#FF2D92] hover:text-white transition-all duration-300 inline-block">
                         Why Me
-                    </button>
+                    </a>
                 </div>
                 <button @click="mobileMenuOpen = !mobileMenuOpen" class="md:hidden text-gray-400 hover:text-white">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -379,10 +379,10 @@
                 <a href="#exchange" @click="mobileMenuOpen = false" class="block py-2 text-gray-400 hover:text-white">海外交换</a>
                 <a href="#writing" @click="mobileMenuOpen = false" class="block py-2 text-gray-400 hover:text-white">写作</a>
                 <a href="#career" @click="mobileMenuOpen = false" class="block py-2 text-gray-400 hover:text-white">职业方向</a>
-                <button @click="showWhyMe = true; mobileMenuOpen = false" 
-                        class="w-full mt-2 px-4 py-2 rounded-full glass-pink text-[#FF2D92]">
+                <a href="#whyme" @click="mobileMenuOpen = false" 
+                   class="block w-full mt-2 px-4 py-2 rounded-full glass-pink text-[#FF2D92] text-center">
                     Why Me
-                </button>
+                </a>
             </div>
         </nav>
         
@@ -970,7 +970,7 @@
             name: '陈瑾嫣',
             title: '金融科技学生',
             titlePrefix: 'FinTech Student',
-            photo: '../实习/微信图片_20260407143321_7_85.jpg',
+            photo: './assets/微信图片_20260407143321_7_85.jpg',
             mbti: 'ENFJ',
             traits: ['喜好新鲜事物', '鬼点子大王', '热爱挑战'],
             careerStatus: '正在尝试从金融转向感兴趣的海外营销、产品、海外运营，努力ing！',
